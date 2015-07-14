@@ -5,8 +5,15 @@ Host localhost
   GSSAPIAuthentication no
   PasswordAuthentication no
 
-{% if gitolite_mirroring_peers %}
+{% if gitolite_mirroring_peers is mapping %}
+{% for mirror in gitolite_mirroring_peers.keys() %}
+Host {{ mirror }}
+  HostName {{ gitolite_mirroring_peers[mirror] }}
+  IdentityFile {{ gitolite_user_home }}/.ssh/server-{{ gitolite_gitoliterc_hostname }}
+  PasswordAuthentication no
+{% endfor %}
+{% else %}
 Host {{ gitolite_mirroring_peers|join(' ') }}
   IdentityFile {{ gitolite_user_home }}/.ssh/server-{{ gitolite_gitoliterc_hostname }}
-  StrictHostKeyChecking no
+  StrictHostKeyChecking {{ gitolite_strict_host_key_checking }}
 {% endif %}
